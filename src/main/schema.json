@@ -1,0 +1,372 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Pipeline schema",
+  "description": "A pipeline definition",
+  "required": [
+    "jobs"
+  ],
+  "definitions": {
+    "files": {
+      "title": "Files publication",
+      "description": "All file publication of the jobs",
+      "type": "string",
+      "enum": [
+        ""
+      ]
+    },
+    "runOn": {
+      "title": "Agents",
+      "definitions": {
+        "arch": {
+          "type": "object",
+          "title": "CPU Architecture",
+          "properties": {
+            "arch": {
+              "type": "string",
+              "enum": [
+                "x86",
+                "x86_64",
+                "arm",
+                "aarch64",
+                "ia64",
+                "sparc",
+                "riscv64"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "cpu": {
+          "type": "object",
+          "title": "CPU count",
+          "properties": {
+            "cpu": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false
+        },
+        "custom": {
+          "type": "object",
+          "title": "Custom requirement",
+          "properties": {
+            "name": {
+              "description": "Display name of the custom requirement"
+            },
+            "requirement": {
+              "type": "string",
+              "description": "Requirement condition",
+              "enum": [
+                "exists",
+                "not-exists",
+                "contains",
+                "matches",
+                "equals",
+                "not-equals",
+                "more-than",
+                "less-than",
+                "more-than-or-equals",
+                "less-than-or-equals"
+              ]
+            },
+            "parameter": {
+              "description": "Parameter name for the requirement"
+            },
+            "value": {
+              "description": "Value for the requirement"
+            }
+          },
+          "required": ["requirement", "parameter", "name"],
+          "additionalProperties": false
+        },
+        "os-version": {
+          "type": "object",
+          "title": "Operating system version",
+          "properties": {
+            "os-version": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "os-family": {
+          "type": "object",
+          "title": "Operating system family",
+          "properties": {
+            "os-family": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "ram": {
+          "type": "object",
+          "title": "RAM size",
+          "properties": {
+            "ram": {
+              "type": "string",
+              "pattern": "^\\d+GB$"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "anyOf": [
+        {
+          "type": "string",
+          "title": "JetBrains-hosted agents",
+          "description": "These agents are automatically maintained by JetBrains and don't require to be installed or configured by a custome",
+          "enum": [
+            "Windows-Small",
+            "Mac-Medium",
+            "Linux-XLarge",
+            "Linux-Large",
+            "Linux-Medium",
+            "Linux-Small",
+            "Windows-Medium"
+          ]
+        },
+        {
+          "type": "string",
+          "title": "Self-hosted agents",
+          "description": "These agents are manually maintained by the customer and require installation and configuration according to specific requirements",
+          "enum": [
+            "self-hosted"
+          ]
+        },
+        {
+          "type": "object",
+          "title": "Self-hosted agents",
+          "description": "These agents are manually maintained by the customer and require installation and configuration according to specific requirements",
+          "properties": {
+            "self-hosted": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {"$ref": "#/definitions/runOn/definitions/arch"},
+                  {"$ref": "#/definitions/runOn/definitions/cpu"},
+                  {"$ref": "#/definitions/runOn/definitions/os-family"},
+                  {"$ref": "#/definitions/runOn/definitions/os-version"},
+                  {"$ref": "#/definitions/runOn/definitions/ram"},
+                  {"$ref": "#/definitions/runOn/definitions/custom"}
+                ]
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "repositories": {
+      "type": "object",
+      "properties": {
+        "main": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "job": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "title": "Job input parameters",
+          "description": "parameter/value pairs, a parameter value can be accessed with a syntax like %env.GIT_HOME%",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "output-parameters": {
+          "type": "object",
+          "title": "Job output parameters",
+          "description": "parameter/value paris which are provided by the job and visible to dependent jobs with %job.jobId.parameterName% syntax",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "steps": {
+          "title": "Step",
+          "description": "Contains job steps in order of their execution",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "script",
+                  "maven",
+                  "gradle",
+                  "node-js",
+                  "unity"
+                ]
+              },
+              "working-directory": { "type": "string" },
+              "goals": { "type": "string" },
+              "pom-location": { "type": "string" },
+              "runner-arguments": { "type": "string" },
+              "maven-version": { "type": "string" },
+              "local-repo-scope": { "type": "string" },
+              "jdk-home": { "type": "string" },
+              "jvm-args": { "type": "string" },
+              "tasks": { "type": "string" },
+              "gradle-home": { "type": "string" },
+              "use-gradle-wrapper": { "type": "string" },
+              "gradle-wrapper-path": { "type": "string" },
+              "gradle-params": { "type": "string" },
+              "enable-debug": { "type": "string" },
+              "enable-stacktrace": { "type": "string" },
+              "build-file": { "type": "string" },
+              "execute-method": { "type": "string" },
+              "run-editor-tests": { "type": "string" },
+              "project-path": { "type": "string" },
+              "build-target": { "type": "string" },
+              "build-player": { "type": "string" },
+              "no-graphics": { "type": "string" },
+              "silent-crashes": { "type": "string" },
+              "no-quit": { "type": "string" },
+              "arguments": { "type": "string" },
+              "build-player-path": { "type": "string" },
+              "detection-mode": { "type": "string" },
+              "is-incremental": { "type": "string" },
+              "unity-root": { "type": "string" },
+              "script-content": { "type": "string" },
+              "shell-script": { "type": "string" },
+              "docker-image": { "type": "string" },
+              "dockerfile-source": { "type": "string" },
+              "dockerfile-path": { "type": "string" }
+            }
+          }
+        },
+        "files-publication": {
+          "type": "array",
+          "title": "Files publication",
+          "description": "List of files to publish from this job. Can contain glob strings or objects with path and publication settings",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "share-with-jobs": {
+                    "type": "boolean"
+                  },
+                  "publish-artifact": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["path"],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "runs-on": {
+          "$ref": "#/definitions/runOn"
+        },
+        "files": {
+          "$ref": "#/definitions/files"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {}
+              }
+            ]
+          }
+        },
+        "integrations": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {}
+              }
+            ]
+          }
+        },
+        "repositories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/repositories"
+          }
+        },
+        "parallelism": {
+          "type": "number"
+        },
+        "checkout-working-directories-only": {
+          "type": "boolean",
+          "deprecated": true
+        },
+        "enable-dependency-cache": {
+          "type": "boolean"
+        },
+        "allow-reuse": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "name": {
+      "title": "Name of the pipeline",
+      "description": "Display name and id of a pipeline",
+      "type": "string",
+      "deprecated": true
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "secrets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^credentialsJSON:.+"
+      }
+    },
+    "jobs": {
+      "type": "object",
+      "properties": {},
+      "patternProperties": {
+        "^[^\\s]+$": {
+          "$ref": "#/definitions/job"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/job"
+      }
+    }
+  },
+  "additionalProperties": false
+}
