@@ -2,3 +2,7 @@ jobs:
   Job1:
     name: Job 1
     steps: []
+    repositories:
+      - Pipelines_ValrravnAntJUnitSample:
+          path: Ant-JUnit-Sample
+          enabled: true
