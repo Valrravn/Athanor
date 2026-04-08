@@ -6,3 +6,6 @@ jobs:
       - Pipelines_ValrravnAntJUnitSample:
           path: Ant-JUnit-Sample
           enabled: true
+      - Root_HttpsTcqaTestBitbucketOrgTcqaTestSampleJavaAppMavenGitRefsHeadsMain:
+          path: sample-java-app-maven.git
+          enabled: true
