@@ -10,3 +10,5 @@ jobs:
     name: Job 3
     dependencies:
       - Job2
+  Job4:
+    name: Job 4
