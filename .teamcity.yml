@@ -6,5 +6,13 @@ jobs:
       foo: bar
       param2: value
     allow-reuse: false
+  Job2:
+    name: Job 2
+    dependencies:
+      - Job1
+  Job3:
+    name: Job 3
+    dependencies:
+      - Job2
 dependencies:
   - PipelinesWithDSL_Build
