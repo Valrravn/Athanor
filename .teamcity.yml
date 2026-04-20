@@ -1,0 +1,10 @@
+version: 1
+jobs:
+  Job1:
+    name: Job 1
+    parameters:
+      foo: bar
+      param2: value
+    allow-reuse: false
+dependencies:
+  - PipelinesWithDSL_Build
